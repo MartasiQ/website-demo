@@ -18,15 +18,15 @@
         /* Style the title */
         h1 {
             position: absolute; /* Keep it above the image */
-            top: 0%;
-            left: 0%;
-            transform: translate(-50%, -50%) rotate(90deg); /* Center and rotate */
+            top: 10px; /* Distance from the top */
+            left: 10px; /* Distance from the left */
+            transform: rotate(90deg); /* Rotate the text */
             background-color: rgba(0, 0, 0, 0.5); /* Transparent background */
             color: white;
-            padding: 20px;
-            text-align: center;
+            padding: 10px; /* Adjust padding as needed */
             z-index: 1; /* Ensure it is above the image */
             white-space: nowrap; /* Prevent text from wrapping to a new line */
+            font-size: 5vw; /* Scale font size based on viewport width */
         }
 
         /* Make the image fill the screen */
