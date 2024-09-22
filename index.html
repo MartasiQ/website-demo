@@ -3,16 +3,39 @@
 <head>
     <title>MartasiQ</title>
     <style>
-        /* CSS to make the image fit the screen */
+        /* Ensure the body and html take up the full height and prevent scrolling */
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
+            overflow: hidden; /* Disable scrolling */
+            display: flex;
+            justify-content: center; /* Horizontally center */
+            align-items: center;     /* Vertically center */
         }
+
+        /* Style the title */
+        h1 {
+            position: absolute; /* Keep it above the image */
+            top: 5%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Center in both directions */
+            background-color: rgba(0, 0, 0, 0.5); /* Transparent background */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            z-index: 1; /* Ensure it is above the image */
+            white-space: nowrap; /* Prevent text from wrapping to a new line */
+        }
+
+        /* Make the image fill the screen */
         img {
             width: 100vw;  /* 100% of the viewport width */
             height: 100vh; /* 100% of the viewport height */
-            object-fit: cover; /* Ensures the image covers the space while maintaining its aspect ratio */
+            object-fit: cover; /* Ensures the image covers the space while maintaining aspect ratio */
+            position: absolute;
+            top: 0;
+            left: 0;
         }
     </style>
 </head>
