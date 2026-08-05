@@ -1,1 +1,37 @@
-<h1>245 008 023</h1>
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GIF přes celou stránku</title>
+  <style>
+    /* Odstraní výchozí okraje a zabrání zobrazení posuvníků */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000; /* Pozadí v případě načítání */
+    }
+
+    /* Roztáhne GIF přes celé okno se zachováním poměru stran */
+    .fullscreen-gif {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover; /* Zachová poměr stran a vyplní obrazovku (ořízne přebytky) */
+      object-position: center; /* Zaretruje GIF na střed */
+      z-index: -1; /* Umístí GIF na pozadí, pokud chcete mít nad ním text */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nahraďte vas-obrazek.gif cestou k vašemu GIF souboru -->
+  <img src="vas-obrazek.gif" alt="Pozadí" class="fullscreen-gif">
+
+</body>
+</html>
