@@ -23,14 +23,13 @@
       width: 100vw;
       height: 100vh;
       object-fit: cover; /* Zachová poměr stran a vyplní obrazovku (ořízne přebytky) */
-      object-position: center; /* Zaretruje GIF na střed */
-      z-index: -1; /* Umístí GIF na pozadí, pokud chcete mít nad ním text */
+      object-position: center; /* Vycentruje GIF na střed */
+      z-index: 1; /* Zobrazí GIF před pozadím body */
     }
   </style>
 </head>
 <body>
 
-  <!-- Nahraďte vas-obrazek.gif cestou k vašemu GIF souboru -->
   <img src="nino.gif" alt="Pozadí" class="fullscreen-gif">
 
 </body>
