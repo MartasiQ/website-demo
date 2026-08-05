@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GIF přes celou stránku</title>
+  <title id="page-title">GIF přes celou stránku</title>
   <style>
     html, body {
       margin: 0;
@@ -28,19 +28,23 @@
 </head>
 <body>
 
-  <!-- Element img bez napevno zadaného src -->
   <img id="bg-gif" alt="Pozadí" class="fullscreen-gif">
 
   <script>
-    // Seznam tvých GIFů
-    const gify = ['nino.gif', 'nino2.gif'];
+    // Seznam objektů s cestou k GIFu a odpovídajícím názvem stránky
+    const gify = [
+      { src: 'bara.gif', title: 'Bára' },
+      { src: 'kacka.gif', title: 'Kačka' }
+    ];
 
     // Náhodný výběr indexu (0 nebo 1)
     const nahodnyIndex = Math.floor(Math.random() * gify.length);
 
-    // Nastavení zdroje obrázku
-    document.getElementById('bg-gif').src = gify[nahodnyIndex];
+    // Nastavení obrázku a nadpisu karty v prohlížeči
+    document.getElementById('bg-gif').src = gify[nahodnyIndex].src;
+    document.title = gify[nahodnyIndex].title;
   </script>
 
 </body>
+</html>
 </html>
