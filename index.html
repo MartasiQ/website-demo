@@ -3,8 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="page-title">GIF přes celou stránku</title>
+  <title id="page-title">Losuji…</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Baloo+2:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg-deep: #0d0620;
+      --bg-mid: #1b0f3a;
+      --gold: #ffd23f;
+      --pink: #ff3d68;
+      --cream: #fff8ec;
+      --ink: #1b1030;
+    }
+
     html, body {
       margin: 0;
       padding: 0;
@@ -12,6 +24,7 @@
       height: 100%;
       overflow: hidden;
       background-color: #000;
+      font-family: 'Baloo 2', 'Comic Sans MS', system-ui, sans-serif;
     }
 
     .fullscreen-gif {
@@ -23,28 +36,278 @@
       object-fit: contain;
       object-position: center;
       z-index: 1;
+      opacity: 0;
+      transform: scale(0.4) rotate(-8deg);
+      cursor: pointer;
+    }
+
+    .fullscreen-gif.reveal {
+      animation: bounceIn 0.7s cubic-bezier(.36,1.75,.4,1.05) forwards;
+    }
+    .fullscreen-gif.idle {
+      animation: wiggle 4s ease-in-out infinite;
+    }
+
+    @keyframes bounceIn {
+      0%   { transform: scale(0.3) rotate(-12deg); }
+      60%  { transform: scale(1.08) rotate(4deg); }
+      80%  { transform: scale(0.96) rotate(-2deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      50%      { transform: rotate(1.5deg) scale(1.01); }
+    }
+
+    /* Slot-machine "losovací" obrazovka */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      background: radial-gradient(circle at center, var(--bg-mid) 0%, var(--bg-deep) 70%, #000 100%);
+      transition: opacity 0.4s ease;
+    }
+    #loader.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #reel {
+      font-size: 22vmin;
+      line-height: 1;
+      filter: drop-shadow(0 0 20px rgba(255, 210, 63, 0.35));
+    }
+    #loader-text {
+      font-family: 'Bangers', cursive;
+      letter-spacing: 2px;
+      color: var(--gold);
+      font-size: clamp(18px, 4vmin, 32px);
+      text-shadow: 2px 2px 0 var(--ink);
+      transform: rotate(-2deg);
+    }
+
+    /* Bublina se jménem a vtipnou hláškou */
+    #caption {
+      position: fixed;
+      left: 50%;
+      bottom: 6vh;
+      transform: translateX(-50%) translateY(40px) scale(0.7);
+      z-index: 4;
+      opacity: 0;
+      text-align: center;
+      background: var(--cream);
+      border: 4px solid var(--ink);
+      border-radius: 22px;
+      padding: 10px 26px 16px;
+      box-shadow: 7px 7px 0 var(--ink);
+      max-width: 86vw;
+    }
+    #caption.show {
+      animation: popCaption 0.55s cubic-bezier(.36,1.75,.4,1.05) 0.15s forwards;
+    }
+    @keyframes popCaption {
+      to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    }
+    #caption-name {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(28px, 6vmin, 56px);
+      color: var(--pink);
+      -webkit-text-stroke: 1.5px var(--ink);
+      margin: 0;
+      line-height: 1;
+      display: inline-block;
+      transform: rotate(-2deg);
+    }
+    #caption-tag {
+      margin: 6px 0 0;
+      font-size: clamp(12px, 2.4vmin, 16px);
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    /* Nápověda k novému losování */
+    #hint {
+      position: fixed;
+      top: 3vh;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 4;
+      color: var(--cream);
+      font-size: clamp(12px, 2vmin, 15px);
+      background: rgba(13, 6, 32, 0.6);
+      padding: 6px 14px;
+      border-radius: 999px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+    }
+    #hint.show { opacity: 0.95; }
+
+    /* Konfety */
+    .confetti {
+      position: fixed;
+      top: -5vh;
+      z-index: 3;
+      font-size: 22px;
+      pointer-events: none;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      to { transform: translateY(112vh) rotate(540deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fullscreen-gif.reveal, .fullscreen-gif.idle {
+        animation: none !important;
+        transform: none !important;
+      }
+      #caption.show {
+        animation: none !important;
+        opacity: 1;
+        transform: translateX(-50%);
+      }
+      .confetti { display: none; }
     }
   </style>
 </head>
 <body>
+  <div id="loader">
+    <div id="reel">🎲</div>
+    <div id="loader-text">LOSUJU TO NEJLEPŠÍ…</div>
+  </div>
 
-  <img id="bg-gif" alt="Pozadí" class="fullscreen-gif">
+  <img id="bg-gif" class="fullscreen-gif" alt="Náhodný vtipný obrázek">
+
+  <div id="caption">
+    <p id="caption-name"></p>
+    <p id="caption-tag"></p>
+  </div>
+
+  <div id="hint">🔁 Klikni nebo zmáčkni klávesu pro nové kolo</div>
 
   <script>
     // Seznam objektů s cestou k GIFu a odpovídajícím názvem stránky
     const gify = [
-      { src: 'nino.gif', title: 'Bára' },
-      { src: 'nino2.gif', title: 'Kačka' }
+      { src: 'nino.gif', title: 'Sanderso kuchař' },
+      { src: 'nino2.gif', title: 'Sanderso venku' }
     ];
 
-    // Náhodný výběr indexu (0 nebo 1)
-    const nahodnyIndex = Math.floor(Math.random() * gify.length);
+    // Vtipné hlášky pod jménem – vybírá se náhodně, ať se to neokouká
+    const hlasky = [
+      'Vědecky prokázáno: 100 % rozkoš.',
+      'Varování: může vyvolat nekontrolovatelný úsměv.',
+      'Certifikováno jako naprostá legenda.',
+      'Tahle osoba právě vyhrála internet.',
+      'Únik z laboratoře roztomilosti.',
+      'Level: Boss. Obtížnost: Nemožná konkurence.'
+    ];
 
-    // Nastavení obrázku a nadpisu karty v prohlížeči
-    document.getElementById('bg-gif').src = gify[nahodnyIndex].src;
-    document.title = gify[nahodnyIndex].title;
+    // Symboly, které se míhají na "herním automatu" před odhalením
+    const reelEmoji = ['🎲', '🎰', '🔀', '🔮', '🍀', '❓'];
+
+    const gifEl = document.getElementById('bg-gif');
+    const loaderEl = document.getElementById('loader');
+    const reelEl = document.getElementById('reel');
+    const captionEl = document.getElementById('caption');
+    const nameEl = document.getElementById('caption-name');
+    const tagEl = document.getElementById('caption-tag');
+    const hintEl = document.getElementById('hint');
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let spinning = false;
+    let audioCtx = null;
+
+    // Krátké komické "bliply" bez nutnosti řešit zvukové soubory
+    function boop(freqStart, freqEnd, duration) {
+      try {
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freqStart, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(freqEnd, audioCtx.currentTime + duration);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain).connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) { /* prohlížeč zvuk nepustí – nic se neděje */ }
+    }
+
+    function confettiBurst(count) {
+      const emojis = ['🎉', '✨', '🎊', '⭐', '💥'];
+      for (let i = 0; i < count; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti';
+        piece.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        piece.style.left = Math.random() * 100 + 'vw';
+        piece.style.animationDuration = (1.8 + Math.random() * 1.4) + 's';
+        piece.style.fontSize = (16 + Math.random() * 18) + 'px';
+        document.body.appendChild(piece);
+        piece.addEventListener('animationend', () => piece.remove());
+      }
+    }
+
+    function spinAndReveal() {
+      if (spinning) return;
+      spinning = true;
+
+      gifEl.classList.remove('reveal', 'idle');
+      gifEl.style.opacity = '0';
+      captionEl.classList.remove('show');
+      hintEl.classList.remove('show');
+      loaderEl.style.display = 'flex';
+      loaderEl.classList.remove('hide');
+
+      const maxTicks = reduceMotion ? 1 : 14;
+      let ticks = 0;
+
+      function tick(delay) {
+        reelEl.textContent = reelEmoji[Math.floor(Math.random() * reelEmoji.length)];
+        boop(220 + Math.random() * 200, 180, 0.06);
+        ticks++;
+        if (ticks < maxTicks) {
+          setTimeout(() => tick(delay + 14), delay + 14);
+        } else {
+          finishSpin();
+        }
+      }
+      tick(40);
+
+      function finishSpin() {
+        const pick = gify[Math.floor(Math.random() * gify.length)];
+        const hlaska = hlasky[Math.floor(Math.random() * hlasky.length)];
+
+        gifEl.src = pick.src;
+        document.title = pick.title;
+        nameEl.textContent = pick.title;
+        tagEl.textContent = hlaska;
+
+        loaderEl.classList.add('hide');
+        setTimeout(() => { loaderEl.style.display = 'none'; }, 400);
+
+        gifEl.classList.add('reveal');
+        gifEl.style.opacity = '1';
+        captionEl.classList.add('show');
+        boop(660, 880, 0.18);
+        if (!reduceMotion) confettiBurst(28);
+
+        setTimeout(() => gifEl.classList.add('idle'), 700);
+        setTimeout(() => hintEl.classList.add('show'), 1600);
+
+        spinning = false;
+      }
+    }
+
+    spinAndReveal();
+    document.body.addEventListener('click', spinAndReveal);
+    document.addEventListener('keydown', spinAndReveal);
   </script>
-
 </body>
-</html>
 </html>
