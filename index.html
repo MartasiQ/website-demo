@@ -4,15 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="page-title">Losuji…</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Baloo+2:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Baloo+2:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-deep: #0d0620;
       --bg-mid: #1b0f3a;
       --gold: #ffd23f;
       --pink: #ff3d68;
+      --mint: #4ce0b3;
       --cream: #fff8ec;
       --ink: #1b1030;
     }
@@ -25,6 +27,8 @@
       overflow: hidden;
       background-color: #000;
       font-family: 'Baloo 2', 'Comic Sans MS', system-ui, sans-serif;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .fullscreen-gif {
@@ -41,12 +45,8 @@
       cursor: pointer;
     }
 
-    .fullscreen-gif.reveal {
-      animation: bounceIn 0.7s cubic-bezier(.36,1.75,.4,1.05) forwards;
-    }
-    .fullscreen-gif.idle {
-      animation: wiggle 4s ease-in-out infinite;
-    }
+    .fullscreen-gif.reveal { animation: bounceIn 0.7s cubic-bezier(.36,1.75,.4,1.05) forwards; }
+    .fullscreen-gif.idle { animation: wiggle 4s ease-in-out infinite; }
 
     @keyframes bounceIn {
       0%   { transform: scale(0.3) rotate(-12deg); }
@@ -59,27 +59,60 @@
       50%      { transform: rotate(1.5deg) scale(1.01); }
     }
 
+    /* Otřes celé obrazovky při odhalení – protože drama */
+    body.shake { animation: shake 0.42s ease-in-out; }
+    @keyframes shake {
+      0%, 100% { transform: translate(0, 0); }
+      20% { transform: translate(-7px, 4px) rotate(-0.4deg); }
+      40% { transform: translate(6px, -5px) rotate(0.4deg); }
+      60% { transform: translate(-4px, -3px); }
+      80% { transform: translate(3px, 4px); }
+    }
+
+    /* DISCO REŽIM (tajný kód) */
+    body.disco #bg-gif { animation: disco 1.1s linear infinite !important; }
+    body.disco { background: #000; }
+    @keyframes disco {
+      0%   { filter: hue-rotate(0deg) saturate(1.6); transform: scale(1) rotate(-2deg); }
+      50%  { filter: hue-rotate(180deg) saturate(2.4); transform: scale(1.04) rotate(2deg); }
+      100% { filter: hue-rotate(360deg) saturate(1.6); transform: scale(1) rotate(-2deg); }
+    }
+    body.disco::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 2; pointer-events: none;
+      background: linear-gradient(120deg, rgba(255,61,104,.35), rgba(76,224,179,.35), rgba(255,210,63,.35));
+      background-size: 300% 300%;
+      animation: discoLights 2.2s linear infinite;
+      mix-blend-mode: overlay;
+    }
+    @keyframes discoLights {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 300% 50%; }
+    }
+
     /* Slot-machine "losovací" obrazovka */
     #loader {
       position: fixed;
       inset: 0;
-      z-index: 5;
+      z-index: 8;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 18px;
+      gap: 12px;
       background: radial-gradient(circle at center, var(--bg-mid) 0%, var(--bg-deep) 70%, #000 100%);
-      transition: opacity 0.4s ease;
+      transition: opacity 0.25s ease;
     }
-    #loader.hide {
-      opacity: 0;
-      pointer-events: none;
-    }
+    #loader.hide { opacity: 0; pointer-events: none; }
     #reel {
       font-size: 22vmin;
       line-height: 1;
       filter: drop-shadow(0 0 20px rgba(255, 210, 63, 0.35));
+      animation: reelJitter 0.08s steps(2) infinite;
+    }
+    @keyframes reelJitter {
+      0% { transform: translateY(-4px) rotate(-3deg); }
+      100% { transform: translateY(4px) rotate(3deg); }
     }
     #loader-text {
       font-family: 'Bangers', cursive;
@@ -88,33 +121,32 @@
       font-size: clamp(18px, 4vmin, 32px);
       text-shadow: 2px 2px 0 var(--ink);
       transform: rotate(-2deg);
+      text-align: center;
+      padding: 0 6vw;
     }
-
-    /* Bublina se jménem a vtipnou hláškou */
+    /* Bublina se jménem, hláškou a naprosto vědeckými statistikami */
     #caption {
       position: fixed;
       left: 50%;
-      bottom: 6vh;
+      bottom: 5vh;
       transform: translateX(-50%) translateY(40px) scale(0.7);
-      z-index: 4;
+      z-index: 5;
       opacity: 0;
       text-align: center;
       background: var(--cream);
       border: 4px solid var(--ink);
       border-radius: 22px;
-      padding: 10px 26px 16px;
+      padding: 10px 26px 14px;
       box-shadow: 7px 7px 0 var(--ink);
       max-width: 86vw;
     }
-    #caption.show {
-      animation: popCaption 0.55s cubic-bezier(.36,1.75,.4,1.05) 0.15s forwards;
-    }
+    #caption.show { animation: popCaption 0.45s cubic-bezier(.36,1.75,.4,1.05) 0.05s forwards; }
     @keyframes popCaption {
-      to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1) rotate(var(--tilt, -1deg)); }
     }
     #caption-name {
       font-family: 'Bangers', cursive;
-      font-size: clamp(28px, 6vmin, 56px);
+      font-size: clamp(26px, 6vmin, 56px);
       color: var(--pink);
       -webkit-text-stroke: 1.5px var(--ink);
       margin: 0;
@@ -129,13 +161,62 @@
       font-weight: 600;
     }
 
+    #stats {
+      margin: 9px 0 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 5px 7px;
+      max-width: min(78vw, 420px);
+    }
+    #stats span {
+      font-size: clamp(9px, 1.8vmin, 12px);
+      font-weight: 600;
+      background: var(--ink);
+      color: var(--cream);
+      padding: 3px 9px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    /* MEGA JACKPOT */
+    #jackpot {
+      position: fixed;
+      inset: 0;
+      z-index: 7;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      background: radial-gradient(circle at center, rgba(255,210,63,.28), rgba(255,61,104,.18) 60%, transparent 75%);
+    }
+    #jackpot.on { display: flex; animation: jackFlash 1.6s ease-out forwards; }
+    #jackpot span {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(34px, 11vmin, 120px);
+      color: #fff;
+      -webkit-text-stroke: 5px var(--ink);
+      paint-order: stroke fill;
+      text-align: center;
+      line-height: .95;
+      animation: jackZoom 1.6s cubic-bezier(.2,1.6,.3,1) forwards;
+    }
+    @keyframes jackFlash {
+      0% { opacity: 0; } 12% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; }
+    }
+    @keyframes jackZoom {
+      0% { transform: scale(0.3) rotate(-10deg); }
+      40% { transform: scale(1.1) rotate(4deg); }
+      100% { transform: scale(1.35) rotate(-2deg); }
+    }
+
     /* Nápověda k novému losování */
     #hint {
       position: fixed;
       top: 3vh;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 4;
+      z-index: 5;
       color: var(--cream);
       font-size: clamp(12px, 2vmin, 15px);
       background: rgba(13, 6, 32, 0.6);
@@ -144,24 +225,37 @@
       opacity: 0;
       transition: opacity 0.5s ease;
       pointer-events: none;
+      text-align: center;
+      max-width: 76vw;
     }
     #hint.show { opacity: 0.95; }
 
-    /* Konfety */
+    /* Konfety a jiskřičky */
     .confetti {
       position: fixed;
-      top: -5vh;
-      z-index: 3;
+      top: -6vh;
+      z-index: 4;
       font-size: 22px;
       pointer-events: none;
       animation: fall linear forwards;
     }
     @keyframes fall {
-      to { transform: translateY(112vh) rotate(540deg); }
+      to { transform: translateY(115vh) rotate(720deg); }
+    }
+    .spark {
+      position: fixed;
+      z-index: 4;
+      pointer-events: none;
+      font-size: 14px;
+      animation: sparkOut .7s ease-out forwards;
+    }
+    @keyframes sparkOut {
+      0% { opacity: .95; transform: scale(1) translateY(0); }
+      100% { opacity: 0; transform: scale(.4) translateY(-26px); }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .fullscreen-gif.reveal, .fullscreen-gif.idle {
+      .fullscreen-gif.reveal, .fullscreen-gif.idle, #reel, body.disco #bg-gif {
         animation: none !important;
         transform: none !important;
       }
@@ -170,7 +264,9 @@
         opacity: 1;
         transform: translateX(-50%);
       }
-      .confetti { display: none; }
+      body.shake { animation: none !important; }
+      .confetti, .spark, body.disco::after { display: none; }
+      #jackpot.on span { animation: none !important; }
     }
   </style>
 </head>
@@ -182,14 +278,22 @@
 
   <img id="bg-gif" class="fullscreen-gif" alt="Náhodný vtipný obrázek">
 
+  <div id="jackpot"><span>💰 MEGA<br>JACKPOT 💰</span></div>
+
   <div id="caption">
     <p id="caption-name"></p>
     <p id="caption-tag"></p>
+    <div id="stats"></div>
   </div>
 
   <div id="hint">🔁 Klikni nebo zmáčkni klávesu pro nové kolo</div>
 
   <script>
+    /* ------------------------------------------------------------------
+       Malá nápověda pro budoucího mě: tahle stránka nemá žádný smysl
+       a je na to hrdá. Přidávej gagy, ne funkce.
+       ------------------------------------------------------------------ */
+
     // Seznam objektů s cestou k GIFu a odpovídajícím názvem stránky
     const gify = [
       { src: 'nino.gif', title: 'Sanderso kuchař' },
@@ -203,33 +307,161 @@
       'Certifikováno jako naprostá legenda.',
       'Tahle osoba právě vyhrála internet.',
       'Únik z laboratoře roztomilosti.',
-      'Level: Boss. Obtížnost: Nemožná konkurence.'
+      'Level: Boss. Obtížnost: Nemožná konkurence.',
+      'Nezávisle testováno. Test skončil objetím.',
+      'Obsahuje 0 g cukru a 400 % šarmu.',
+      'Doporučeno 9 z 10 vědců. Ten desátý brečel dojetím.',
+      'Neschválené ministerstvem, protože je to moc silné.',
+      'Nesahat. Rozpustí ti to srdce.',
+      'Statisticky nejlepší věc na téhle doméně.',
+      'Byl by prezident, ale nemá občanku.',
+      'Balení obsahuje: 1× legendu, 0× stížnost.',
+      'Světový rekord v kategorii „no tak jo“.',
+      'Pozor: může způsobit náhlé „aaaawww“.',
+      'Ručně vybráno naším nejlepším náhodným číslem.',
+      'Zdroj: důvěřuj mi, brácho.',
+      'Tato bytost nikdy neposlala e-mail. Respekt.',
+      'Vhodné pro pondělí, úterý a všechny ostatní dny.',
+      'Nedaří se ti den? Tady, oprava.',
+      'Cena za nejlepší výkon v roli „existuje“.',
+      'Recenze: ★★★★★ „plakal jsem“ – nějaký chlap',
+      'Kdyby to bylo lepší, bylo by to nelegální.',
+      'Odborná komise zasedla a rozhodla: ano.',
+      'Neobsahuje reklamy, cookies ani špatnou náladu.',
+      'Testováno v laboratoři. Laboratoř je teď plná chlupů.',
+      'Splňuje evropskou normu na roztomilost. S přehledem.',
+      'Podle zákona č. 1/2026 musí být tato bytost pohlazena.',
+      'Jako budík nefunguje. Vyzkoušeno. Několikrát.',
+      'Devět z deseti pamlsků zmizelo bez vysvětlení.',
+      'Vysoce návykové. Léčba neexistuje.',
+      'Odmítl se vyjádřit k rozbité váze.',
+      'Denní doporučená dávka: čtyři tyhle gify.',
+      'Váha neznámá. Nesedí na váhu z principu.',
+      'V předchozím životě byl polštář. Dělal to dobře.',
+      'Nemá LinkedIn a je mu skvěle.',
+      'Nikdy neřekl „hodíme si k tomu call“.',
+      'Vyhrál by olympiádu v ležení. Bez tréninku.',
+      'Přemýšlí o svačině. Ano, teď zase.',
+      'Nula chyb v kódu, protože nikdy nekódoval. Génius.',
+      'Odborně přezdívaný „ta hodná potvora“.',
+      'Ministerstvo zdraví doporučuje: koukej dál.',
+      'Pojištěno na částku, kterou nechceš znát.',
+      'Vybrán z celkem dvou uchazečů. Konkurence byla tvrdá.',
+      'Recenze: „nemám slov, jen zvuky“ – uživatelka z Brna',
+      'Recenze: „vrátil bych to, ale nedokážu“ – Petr, 34',
+      'Zvládne sedmnáct různých pozic. Všechny na gauči.',
+      'Poslední aktualizace: nikdy. Funguje perfektně.',
+      'Náhodně vybráno. Náhoda dnes odvedla výbornou práci.',
+      'Nedostupné v žádném obchodě. Naštěstí pro obchody.',
+      'Zdravotní varování: způsobuje mluvení vysokým hlasem.',
+      'Kdyby dávali Nobelovku za existenci, tak jasně tenhle.',
+      'Do práce nepůjde a nikdo ho nepřesvědčí.',
+      'Bez konzervantů. Jen čistá chaotická energie.',
+      'Prošel bezpečnostní kontrolou. Kontrola ho pohladila.',
+      'Využívá 100 % gauče. Optimalizace na maximum.',
+      'Nepřečetl podmínky užívání. Ale ty taky ne.',
+      'Doba použitelnosti: navždy. Otevřené balení nevadí.',
+      'Neumí lhát. Zkoušel to u prázdné misky.',
+      'Legenda říká, že jednou zaplatil za jídlo. Legenda lže.',
+      'Odborník na spánek. Nasbíral 14 000 hodin výzkumu.',
+      'Tento obrázek nahradil moji terapii.',
+      'Sponzorováno ničím. Je to zdarma. Šílené, viď.',
+      'Vyžaduje 0 baterií a 100 % tvojí pozornosti.',
+      'Hodnocení kritiků: 12/10, stupnice byla rozšířena.',
+      'Nemá plán B, protože plán A je být rozkošný.',
+      'Součástí balení není nic, protože už je to komplet.',
+      'Vypadá to, že něco chystá. Vždycky to tak vypadá.',
+      'Odborný posudek: „no tohle“ a pak dlouhé ticho.'
     ];
 
     // Symboly, které se míhají na "herním automatu" před odhalením
-    const reelEmoji = ['🎲', '🎰', '🔀', '🔮', '🍀', '❓'];
+    const reelEmoji = ['🎲', '🎰', '🔀', '🔮', '🍀', '❓', '🎯', '🪅', '🧨', '🥁'];
+
+    // Texty během losování – čím víc klikáš, tím víc mě to baví
+    const loaderTexty = [
+      'LOSUJU TO NEJLEPŠÍ…',
+      'KALIBRUJI VĚDECKÉ ÚDAJE…',
+      'KONZULTUJI S VĚDCI…',
+      'PŘEPOČÍTÁVÁM ŽUŽU KOEFICIENT…',
+      'MÍCHÁM PIXELY…',
+      'PTÁM SE VESMÍRU…',
+      'PROHLÍŽÍM ARCHIV LEGEND…',
+      'NAHŘÍVÁM GIF NA PROVOZNÍ TEPLOTU…',
+      'VYJEDNÁVÁM S NÁHODOU…',
+      'HÁZÍM KOSTKOU. DVAKRÁT. PRO JISTOTU.',
+      'BUDÍM SERVER. JE NAŠTVANÝ.',
+      'HLEDÁM TO NEJLEPŠÍ V CELÉM VESMÍRU…',
+      'TŘÍDÍM PODLE ROZTOMILOSTI. TRVÁ TO.',
+      'OVĚŘUJI, ŽE NEJSI ROBOT. VYPADÁŠ DOBŘE.',
+      'MÍCHÁM KARTY. JSOU DVĚ.',
+      'PROBOUZÍM ODDĚLENÍ NÁHODY…',
+      'LOSUJI ZNOVU, PRVNÍ VÝSLEDEK BYL MOC SLABÝ…',
+      'KONTROLUJI CHLUPY NA KAMEŘE…',
+      'ZAHŘÍVÁM KOSTKU DO OPTIMÁLNÍ TEPLOTY…',
+      'PTÁM SE MAMKY, JESTLI MŮŽU…'
+    ];
+
+    // Občas dostane jméno naprosto nezasloužený titul
+    const tituly = ['Jeho Excelence ', 'Doktor ', 'Kapitán ', 'Mistr světa ', 'Sir ', 'Generál ', 'Profesor ', 'Legendární '];
 
     const gifEl = document.getElementById('bg-gif');
     const loaderEl = document.getElementById('loader');
     const reelEl = document.getElementById('reel');
+    const loaderTextEl = document.getElementById('loader-text');
     const captionEl = document.getElementById('caption');
     const nameEl = document.getElementById('caption-name');
     const tagEl = document.getElementById('caption-tag');
+    const statsEl = document.getElementById('stats');
+    const jackpotEl = document.getElementById('jackpot');
     const hintEl = document.getElementById('hint');
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let spinning = false;
     let audioCtx = null;
+    let kolo = 0;           // kolikáté losování v této návštěvě
+    let discoOn = false;
+    let keyBuffer = '';
 
-    // Krátké komické "bliply" bez nutnosti řešit zvukové soubory
-    function boop(freqStart, freqEnd, duration) {
+    const rnd = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+    // Naprosto vědecké statistiky
+    const statBanka = [
+      () => ['Nebezpečnost', rnd(0, 2) + '/10'],
+      () => ['Chuť k jídlu', pick(['neomezená', 'ANO', 'i po večeři', 'mimo tabulky'])],
+      () => ['Rychlost', pick(['0,4 km/h', 'nečekaná', 'závisí na svačině', 'ano'])],
+      () => ['Chlupatost', pick(['maximální', 'nadstandard', 'plyšová', 'nezměřitelná'])],
+      () => ['IQ', pick(['ANO', 'otevře dveře', 'tajné', rnd(140, 200) + ''])],
+      () => ['Odhadovaná cena', rnd(2, 9) + ' mil. pamlsků'],
+      () => ['Doporučeno vědci', rnd(9, 11) + '/10'],
+      () => ['Vhodné pro', pick(['každý den', 'celou rodinu', 'pondělí', 'zlé dny'])],
+      () => ['Vedlejší účinky', pick(['úsměv', 'hlasité „awww“', 'ztráta produktivity'])],
+      () => ['Baterie', pick(['nekonečná', '3 %, ale bojuje', 'nabíjí se spánkem'])],
+      () => ['Původ', pick(['laboratoř roztomilosti', 'nebe', 'gauč', 'záhada'])],
+      () => ['Hlasitost', pick(['dostatečná', 'ňuf', 'v noci maximální'])]
+    ];
+
+    // Eskalující nápovědy
+    const napovedy = [
+      { at: 0,  text: '🔁 Klikni nebo zmáčkni klávesu pro nové kolo' },
+      { at: 3,  text: '🔁 Jo, funguje to i podruhé. A potřetí.' },
+      { at: 6,  text: '🔁 Šesté kolo. Nesoudím tě. Moc.' },
+      { at: 11, text: '🔁 Jedenáct. Tohle je teď tvoje hlavní hobby.' },
+      { at: 20, text: '🔁 Dvacet. Doufám, že sedíš pohodlně.' },
+      { at: 35, text: '🔁 Třicet pět. Začínám se bát o tvou myš.' },
+      { at: 60, text: '🔁 Šedesát. Ty víš, že to jsou dva gify, viď?' },
+      { at: 90, text: '🔁 Devadesát. Ok. Respekt. Pokračuj.' }
+    ];
+
+    /* ---------------- zvuky (žádné soubory, jen čirá improvizace) --------------- */
+    function boop(freqStart, freqEnd, duration, type) {
       try {
         audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.type = 'sine';
+        osc.type = type || 'sine';
         osc.frequency.setValueAtTime(freqStart, audioCtx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(freqEnd, audioCtx.currentTime + duration);
         gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
@@ -240,74 +472,185 @@
       } catch (e) { /* prohlížeč zvuk nepustí – nic se neděje */ }
     }
 
-    function confettiBurst(count) {
-      const emojis = ['🎉', '✨', '🎊', '⭐', '💥'];
+    // Fanfára pro jackpot – čtyři tóny a hodně sebevědomí
+    function fanfara() {
+      [523, 659, 784, 1047].forEach((f, i) => {
+        setTimeout(() => boop(f, f * 1.02, 0.22, 'triangle'), i * 90);
+      });
+    }
+
+    /* ---------------- efekty ---------------- */
+    function confettiBurst(count, sada) {
+      if (reduceMotion) return;
+      const emojis = sada || ['🎉', '✨', '🎊', '⭐', '💥', '🫧', '🌈'];
       for (let i = 0; i < count; i++) {
         const piece = document.createElement('div');
         piece.className = 'confetti';
-        piece.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        piece.textContent = pick(emojis);
         piece.style.left = Math.random() * 100 + 'vw';
-        piece.style.animationDuration = (1.8 + Math.random() * 1.4) + 's';
+        piece.style.animationDuration = (1.6 + Math.random() * 1.2) + 's';
+        piece.style.animationDelay = (Math.random() * 0.3) + 's';
         piece.style.fontSize = (16 + Math.random() * 18) + 'px';
         document.body.appendChild(piece);
         piece.addEventListener('animationend', () => piece.remove());
       }
     }
 
+    function shake() {
+      if (reduceMotion) return;
+      document.body.classList.remove('shake');
+      void document.body.offsetWidth;
+      document.body.classList.add('shake');
+    }
+
+    /* ---------------- hlavní losovačka ---------------- */
     function spinAndReveal() {
       if (spinning) return;
       spinning = true;
+      kolo++;
 
       gifEl.classList.remove('reveal', 'idle');
       gifEl.style.opacity = '0';
       captionEl.classList.remove('show');
       hintEl.classList.remove('show');
+      jackpotEl.classList.remove('on');
       loaderEl.style.display = 'flex';
       loaderEl.classList.remove('hide');
+      loaderTextEl.textContent = kolo === 1 ? loaderTexty[0] : pick(loaderTexty);
 
-      const maxTicks = reduceMotion ? 1 : 14;
+      // Rolování: krátké kroky s jemným zpomalením na konci
+      const maxTicks = reduceMotion ? 1 : 13;
       let ticks = 0;
 
       function tick(delay) {
-        reelEl.textContent = reelEmoji[Math.floor(Math.random() * reelEmoji.length)];
-        boop(220 + Math.random() * 200, 180, 0.06);
+        reelEl.textContent = pick(reelEmoji);
+        boop(240 + Math.random() * 220, 190, 0.04);
         ticks++;
         if (ticks < maxTicks) {
-          setTimeout(() => tick(delay + 14), delay + 14);
+          setTimeout(() => tick(delay + 7), delay + 7);
         } else {
           finishSpin();
         }
       }
-      tick(40);
+      tick(18);
 
       function finishSpin() {
-        const pick = gify[Math.floor(Math.random() * gify.length)];
-        const hlaska = hlasky[Math.floor(Math.random() * hlasky.length)];
+        const pickGif = pick(gify);
+        const hlaska = pick(hlasky);
+        const jackpot = Math.random() < 0.08;   // vzácná sláva
 
-        gifEl.src = pick.src;
-        document.title = pick.title;
-        nameEl.textContent = pick.title;
-        tagEl.textContent = hlaska;
+        gifEl.src = pickGif.src;
+        document.title = pickGif.title;
+
+        // 1 z 5 dostane naprosto nezasloužený titul
+        nameEl.textContent = (Math.random() < 0.2 ? pick(tituly) : '') + pickGif.title;
+        tagEl.textContent = jackpot ? 'JACKPOT! Tohle je ta vzácná varianta. Sbírej je všechny (jsou dvě).' : hlaska;
+
+        // Tři náhodné vědecké údaje
+        const vybrane = [];
+        const bank = statBanka.slice();
+        for (let i = 0; i < 3 && bank.length; i++) {
+          vybrane.push(bank.splice(Math.floor(Math.random() * bank.length), 1)[0]());
+        }
+        statsEl.innerHTML = vybrane.map(([k, v]) => `<span>${k}: ${v}</span>`).join('');
+
+        captionEl.style.setProperty('--tilt', (Math.random() * 3 - 1.5).toFixed(2) + 'deg');
 
         loaderEl.classList.add('hide');
-        setTimeout(() => { loaderEl.style.display = 'none'; }, 400);
+        setTimeout(() => { loaderEl.style.display = 'none'; }, 250);
 
         gifEl.classList.add('reveal');
         gifEl.style.opacity = '1';
         captionEl.classList.add('show');
-        boop(660, 880, 0.18);
-        if (!reduceMotion) confettiBurst(28);
+        shake();
+
+        if (jackpot) {
+          jackpotEl.classList.add('on');
+          fanfara();
+          confettiBurst(120, ['💰', '🎉', '🤑', '💎', '🌟', '🎊']);
+        } else {
+          boop(660, 880, 0.18);
+          confettiBurst(28);
+        }
+
+        // Nápověda, která postupně ztrácí trpělivost
+        const nap = napovedy.filter(n => kolo > n.at).pop() || napovedy[0];
+        hintEl.textContent = nap.text;
 
         setTimeout(() => gifEl.classList.add('idle'), 700);
-        setTimeout(() => hintEl.classList.add('show'), 1600);
+        setTimeout(() => hintEl.classList.add('show'), 1100);
 
         spinning = false;
       }
     }
 
+    /* ---------------- tajné kódy ---------------- */
+    function toggleDisco() {
+      discoOn = !discoOn;
+      document.body.classList.toggle('disco', discoOn);
+      if (discoOn) {
+        fanfara();
+        confettiBurst(70, ['🪩', '🕺', '💃', '🎶', '✨']);
+      } else {
+        boop(600, 120, 0.4, 'triangle');
+      }
+    }
+
+    function secretCheck(key) {
+      keyBuffer = (keyBuffer + key.toLowerCase()).slice(-12);
+      if (keyBuffer.endsWith('nino')) { keyBuffer = ''; toggleDisco(); return; }
+      if (keyBuffer.endsWith('42')) {
+        keyBuffer = '';
+        confettiBurst(40, ['4️⃣', '2️⃣', '🐋', '🪐', '🌌', '🚀']);
+        boop(300, 1200, 0.35, 'triangle');
+        return;
+      }
+      if (keyBuffer.endsWith('boing')) {
+        keyBuffer = '';
+        shake();
+        boop(180, 900, 0.3, 'sawtooth');
+      }
+    }
+
+    /* ---------------- jiskřičky za kurzorem ---------------- */
+    let lastSpark = 0;
+    document.addEventListener('pointermove', e => {
+      if (reduceMotion || e.pointerType === 'touch') return;
+      const now = e.timeStamp;
+      if (now - lastSpark < 55) return;
+      lastSpark = now;
+      const s = document.createElement('div');
+      s.className = 'spark';
+      s.textContent = pick(['✨', '⭐', '·', '🫧', '💫']);
+      s.style.left = (e.clientX - 6) + 'px';
+      s.style.top = (e.clientY - 6) + 'px';
+      document.body.appendChild(s);
+      s.addEventListener('animationend', () => s.remove());
+    }, { passive: true });
+
+    /* ---------------- záložka, která se ti stýská ---------------- */
+    let tituleks = 0;
+    const zebrani = ['Vrať se! 🥺', 'Haló? 👀', 'Je tu smutno… 😿', 'Pořád tu jsem 🐾'];
+    let zebraniTimer = null;
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        zebraniTimer = setInterval(() => {
+          document.title = zebrani[tituleks++ % zebrani.length];
+        }, 1400);
+      } else {
+        clearInterval(zebraniTimer);
+        document.title = nameEl.textContent || 'Losuji…';
+      }
+    });
+
+    /* ---------------- start ---------------- */
     spinAndReveal();
     document.body.addEventListener('click', spinAndReveal);
-    document.addEventListener('keydown', spinAndReveal);
+    document.addEventListener('keydown', e => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key.length === 1) secretCheck(e.key);
+      spinAndReveal();
+    });
   </script>
 </body>
 </html>
